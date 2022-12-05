@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Smell | Sensory Simulator</title>
+        <link rel="icon" href="./images/human_nose.png">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
         <style>
@@ -19,9 +20,15 @@
                 transform: translate(-50%, -50%);
                 font-size: 32px;
             }
+            #human-nose-img, #cartoon-nose-img {
+                position: absolute;
+                top: 50vh;
+                left: 50vw;
+                transform: translate(-50%,  -50%);
+            }
         </style>
     </head>
-    <body>
+    <body style="position: relative;">
         <div id="nose-type-radio" style="position: absolute; top: 5px; left: 5px;">
             <label>
                 <input type="radio" value="real" name="nose-type" checked="true">
@@ -33,24 +40,23 @@
             </label>
         </div>
         <div class="title-text">Smell</div>
+        <img src="./images/human_nose.png" id="human-nose-img" />
+        <img src="./images/cartoon_nose.png" id="cartoon-nose-img" style="visibility: hidden;"/>
+        <div style="display: flex; flex-direction: column; align-items: center; padding-top: 15vh;">
+            <p>Sorry, this feature is still in development!</p>
+        </div>
         <script>
             $(document).ready(function() {
-                /*
                 $('#nose-type-radio').change(() => {
-                    const earType = $('input[name="nose-type"]:checked').val();
-                    if (earType === "real") {
-                        $('#human-right-palm').css('display', 'block');
-                        $('#human-left-palm').css('display', 'block');
-                        $('#cartoon-right-palm').css('display', 'none');
-                        $('#cartoon-left-palm').css('display', 'none');
-                    } else if (earType === "fake") {
-                        $('#cartoon-right-palm').css('display', 'block');
-                        $('#cartoon-left-palm').css('display', 'block');
-                        $('#human-right-palm').css('display', 'none');
-                        $('#human-left-palm').css('display', 'none');
+                    const noseType = $('input[name="nose-type"]:checked').val();
+                    if (noseType === "real") {
+                        $('#human-nose-img').css('visibility', 'visible');
+                        $('#cartoon-nose-img').css('visibility', 'hidden');
+                    } else if (noseType === "fake") {
+                        $('#cartoon-nose-img').css('visibility', 'visible');
+                        $('#human-nose-img').css('visibility', 'hidden');
                     }
                 });
-                */
             });
         </script>
     </body>

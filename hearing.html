@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Hearing | Sensory Simulator</title>
+        <link rel="icon" href="./images/human_ear.png">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
         <style>
@@ -19,6 +20,12 @@
                 transform: translate(-50%, -50%);
                 font-size: 32px;
             }
+            #human-ear-img, #cartoon-ear-img {
+                position: absolute;
+                top: 50vh;
+                left: 50vw;
+                transform: translate(-50%,  -50%);
+            }
         </style>
     </head>
     <body>
@@ -33,24 +40,23 @@
             </label>
         </div>
         <div class="title-text">Hearing</div>
+        <img src="./images/human_ear.png" id="human-ear-img" />
+        <img src="./images/cartoon_ear.png" id="cartoon-ear-img" style="visibility: hidden;"/>
+        <div style="display: flex; flex-direction: column; align-items: center; padding-top: 15vh;">
+            <p>Sorry, this feature is still in development!</p>
+        </div>
         <script>
             $(document).ready(function() {
-                /*
                 $('#ear-type-radio').change(() => {
-                    const armType = $('input[name="ear-type"]:checked').val();
-                    if (armType === "real") {
-                        $('#human-right-palm').css('display', 'block');
-                        $('#human-left-palm').css('display', 'block');
-                        $('#cartoon-right-palm').css('display', 'none');
-                        $('#cartoon-left-palm').css('display', 'none');
-                    } else if (armType === "fake") {
-                        $('#cartoon-right-palm').css('display', 'block');
-                        $('#cartoon-left-palm').css('display', 'block');
-                        $('#human-right-palm').css('display', 'none');
-                        $('#human-left-palm').css('display', 'none');
+                    const earType = $('input[name="ear-type"]:checked').val();
+                    if (earType === "real") {
+                        $('#human-ear-img').css('visibility', 'visible');
+                        $('#cartoon-ear-img').css('visibility', 'hidden');
+                    } else if (earType === "fake") {
+                        $('#cartoon-ear-img').css('visibility', 'visible');
+                        $('#human-ear-img').css('visibility', 'hidden');
                     }
                 });
-                */
             });
         </script>
     </body>

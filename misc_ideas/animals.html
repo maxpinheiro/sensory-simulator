@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <img id="duck-img" style="display: none;" src="" />
+        <img id="dog-img" style="display: none;" src="" />
+        <img id="fox-img" style="display: none;" src="" />
+        <script>
+            function randomDuck() {
+                fetch('https://random-d.uk/api/v2/random').then(res => res.json()).then(data => {
+                    const duckUrl = data.url;
+                    if (duckUrl) {
+                        $('#duck-img').attr('src', duckUrl);
+                        $('#duck-img').css('display', 'block');
+                    }
+                });
+            }
+            function randomCat() {
+                fetch('https://cataas.com/cat').then(res => {})
+            }
+            function randomDog() {
+                fetch('https://dog.ceo/api/breeds/image/random').then(res => res.json()).then(data => {
+                    const dogUrl = data.message;
+                    if (dogUrl) {
+                        $('#dog-img').attr("src", dogUrl);
+                        $('#dog-img').css("display", "block");
+                    }
+                });
+            }
+            function randomFox() {
+                fetch('https://randomfox.ca/floof/').then(res => res.json()).then(data => {
+                    const foxUrl = data.image;
+                    if (foxUrl) {
+                        $('#fox-img').attr("src", foxUrl);
+                        $('#fox-img').css("display", "block");
+                    }
+                });
+            }
+            $(document).ready(function() {
+                randomCat();
+                randomDog();
+                randomFox();
+            });
+        </script>
+    </body>
+</html>

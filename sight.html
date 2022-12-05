@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sight | Sensory Simulator</title>
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <style>
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            body {
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                overflow: hidden;
+                position: relative;
+                transition: background-color 3s;
+            }
+            .water {
+                position: absolute;
+                z-index: -1;
+                bottom: 0px;
+                left: 0px;
+                width: 100vw;
+                height: 0px;
+                /*background-color: blue;*/
+                background-color: rgb(38, 118, 255);
+            }
+
+            .fill-water {
+                animation: water-rise 5s forwards;
+            }
+
+            .drain-water {
+                animation: water-fall 5s forwards;
+            }
+
+            @keyframes water-rise {
+                from {
+                    height: 0px;
+                }
+                to {
+                    height: 100vh;
+                }
+            }
+
+            @keyframes water-fall {
+                from {
+                    height: 100vh;
+                }
+                to {
+                    height: 0px;
+                }
+            }
+
+            .tear {
+                position: absolute;
+                top: 50%;
+                width: 20px;
+                height: 0px;
+                /*background-color: blue;*/
+                background-color: rgb(38, 118, 255);
+                z-index: -1;
+            }
+
+            .tear1 {
+                left: 21%;
+            }
+
+            .tear2 {
+                left: 77%;
+            }
+
+            .tear-fall {
+                animation: water-rise 2s forwards;
+            }
+
+            .plug {
+                position: absolute;
+                bottom: 0px;
+                left: 48%;
+                width: 80px;
+                /*visibility: hidden;*/
+                opacity: 0;
+                transition: 0.5s linear;
+            }
+
+            .pupil {
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: black;
+            }
+
+            .pupil-dilate {
+                animation: expand-pupil 3s forwards;
+            }
+
+            @keyframes expand-pupil {
+                from {
+                    width: 40px;
+                    height: 40px;
+                }
+
+                to {
+                    width: 80px;
+                    height: 80px;
+                }
+            }
+
+            .pupil1 {
+                left: 22%;
+            }
+
+            .pupil2 {
+                left: 78%;
+            }            
+
+            .fade-black {
+                transition: 5s;
+            }
+
+            #eye-cover {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 0px;
+                height: 0px;
+                background-color: black;
+                transition: height 6s ease;
+                z-index: 2;
+            }
+
+            #close-eyes-text {
+                color: white;
+                visibility: hidden; 
+                font-size: 24px; 
+                transition: 3s;
+                position: absolute;
+                top: 50vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+            }
+
+            #eye-container {
+                position: absolute; 
+                height: max-content; 
+                width: max-content;
+                top: 35vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+            }
+            #button-container {
+                position: absolute;
+                bottom: 30vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+            }
+            .title-text {
+                position: absolute;
+                top: 10vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+                font-size: 32px;
+                z-index: -2;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="title-text">Sight</div>
+        <div id="eye-type-radio" style="position: absolute; top: 5px; left: 5px;">
+            <label>
+                <input type="radio" value="real" name="eye-type" checked="true">
+                <span>real</span>
+            </label>
+            <label>
+                <input type="radio" value="fake" name="eye-type">
+                <span>fake</span>
+            </label>
+        </div>
+        <div id="eye-container">
+            <img id="cartoon-eye-img" src="./images/cartoon_eyes_less.png" alt="eyes" class="eyes" style="display: none;"/>
+            <img id="human-eye-img" src="./images/human_eyes.png" alt="eyes" class="eyes" />
+            <div id="tear1" class="tear tear1"></div>
+            <div id="tear2" class="tear tear2"></div>
+            <div id="pupil1" class="pupil pupil1"></div>
+            <div id="pupil2" class="pupil pupil2"></div>
+            <div id="eye-cover"></div>
+        </div>
+        <div id="button-container" style="z-index: 0;">
+            <button id="cry" style="transition: opacity 1s;">Cry</button>
+            <button id="watch-people" style="transition: opacity 1s;" onclick="(() => window.open('https:\/\/www.earthcam.com/', '_blank'))()">Go People-Watching</button>
+            <button id="trip" style="transition: opacity 1s;">Hallucinate</button>
+        </div>
+        <p id="close-eyes-text">Close Your Eyes.</p>
+        <div id="water" class="water"></div>
+        <img src="./images/sink_plug.png" id="plug" class="plug" />
+    </body>
+    <script>
+        $(document).ready(function () {
+            $('#eye-type-radio').change(() => {
+                const eyeType = $('input[name="eye-type"]:checked').val();
+                if (eyeType === "real") {
+                    $('#human-eye-img').css('display', 'block');
+                    $('#cartoon-eye-img').css('display', 'none');
+                } else if (eyeType === "fake") {
+                    $('#cartoon-eye-img').css('display', 'block');
+                    $('#human-eye-img').css('display', 'none');
+                }
+            });
+            $('#cry').click(() => {
+                // disable buttons, send buttons to back
+                $('#cry').attr('disabled', true);
+                $('#trip').attr('disabled', true);
+                $('#watch-people').attr('disabled', true);
+                $('#button-container').css('z-index', -2);
+                $('#eye-type-radio').css('z-index', -2);
+                // tear falls
+                $('#tear1').addClass('tear-fall');
+                $('#tear2').addClass('tear-fall');
+                setTimeout(() => {
+                    $('#water').addClass('fill-water');
+                    setTimeout(() => {
+                        //$('#plug').css('visibility', 'visible');
+                        $('#plug').css('opacity', 1);
+                        $('#plug').css('cursor', 'pointer');
+                        $('#plug').click(() => {
+                            // open plug
+                            $('#plug').css('bottom', '20px');
+                            // drain water
+                            $('#tear1').removeClass('tear-fall');
+                            $('#tear2').removeClass('tear-fall');
+                            $('#water').addClass('drain-water');
+                            $('#water').removeClass('fill-water');
+                            // close plug, restore buttons
+                            $('#button-container').css('z-index', 0);
+                            $('#eye-type-radio').css('z-index', 0);
+                            setTimeout(() => $('#plug').css('bottom', '0px'), 3000);
+                            setTimeout(() => {
+                                $('#plug').css('opacity', 0);
+                                $('#plug').css('cursor', 'default');
+                                $('#cry').attr('disabled', false);
+                                $('#trip').attr('disabled', false);
+                                $('#watch-people').attr('disabled', false);
+                                $('#water').removeClass('drain-water');
+                            }, 5000);
+                        });
+                    }, 4000);
+                }, 1500);
+            })
+            $('#trip').click(() => {
+                // disable buttons
+                $('#cry').attr('disabled', true);
+                $('#trip').attr('disabled', true);
+                $('#watch-people').attr('disabled', true);
+                // open eyes
+                $('#pupil1').addClass('pupil-dilate');
+                $('#pupil2').addClass('pupil-dilate');
+                setTimeout(() => {
+                    // fade to black, hide buttons
+                    $('#close-eyes-text').css('visibility', 'visible');
+                    $('body').css('background-color', 'black');
+                    $('#cry').css('opacity', 0);
+                    $('#trip').css('opacity', 0);
+                    $('#watch-people').css('opacity', 0);
+                    // close eyes (cover with div)
+                    let eyeCover = $('#eye-cover');
+                    eyeCover.css('width', $('#human-eye-img').width());
+                    setTimeout(() => {
+                        eyeCover.css('height', $('#human-eye-img').height());
+                        // move eyes up
+                        setTimeout(() => $('#close-eyes-text').css('top', '20vh'), 2000);
+                        setTimeout(() => window.open('trip.html', '_self'), 5000);
+                    }, 2000);
+                }, 3000);
+            });
+        });
+        /*let eyesImg;
+
+        function preload() {
+                eyesImg = loadImage('./images/eyes_cartoon.png')
+            }
+
+            function setup() {
+                createCanvas(1200, 700);
+            }
+
+            function draw() {
+                background(255);
+                image(eyesImg, width / 4, height / 4, 840, 225);
+            }
+            */
+    </script>
+</html>

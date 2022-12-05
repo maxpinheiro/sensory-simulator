@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <p id="location" style="display: visible;" ></p>
+        <p id="dog-text"  style="display: none;" >Here's a picture of a dog:</p>
+        <img id="dog-img" style="display: none;" src="" />
+        <script>
+            $(document).ready(function() {
+                fetch('https://api64.ipify.org?format=json').then(res => res.json()).then(data => {
+                    const ip = data.ip;
+                    if (ip) {
+                        fetch(`http://ip-api.com/json/${ip}`).then(res => res.json()).then(data => {
+                            const { city, regionName, lat, lon } = data;
+                            if (city && regionName) {
+                                $('#location').html(`You are in: ${city}, ${regionName}`);
+                                $('#location').css("display", "block");
+
+                                
+
+                                fetch('https://dog.ceo/api/breeds/image/random').then(res => res.json()).then(data => {
+                                    const imgAddr = data.message;
+                                    if (imgAddr) {
+                                        $('#dog-img').attr("src", imgAddr);
+                                        $('#dog-img').css("display", "block");
+                                        $('#dog-text').css("display", "block");
+                                    }
+                                })
+                            }
+                            if (lat && lon) {
+                                fetch(`https://api.teleport.org/api/ipaddresses/${ip}/`).then(res => res.json()).then(data => {
+                                    console.log(data);
+                                })
+                                //fetch(`https://api.teleport.org/api/locations/${lat},${lon}/`).then(res => res.json()).then(data => {
+                                    //console.log(data);
+                                //})
+                            }
+                        });
+                    }
+                })
+            });
+        </script>
+    </body>
+</html>

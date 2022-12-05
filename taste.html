@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <title>Taste | Sensory Simulator</title>
+        <style>
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            body {
+                position: relative;
+                margin: 0;
+            }
+            #cartoon-mouth-open-img, #cartoon-mouth-closed-img, #human-mouth-open-img, #human-mouth-closed-img {
+                position: absolute;
+                top: 50vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+            }
+            .title-text {
+                position: absolute;
+                top: 10vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+                font-size: 32px;
+            }
+            #munch-link {
+                color: rgba(255, 255, 255, 0.5);
+                text-decoration: none;
+                visibility: hidden;
+                z-index: 2;
+                position: absolute;
+                top: 48vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="title-text">Taste</div>
+        <div id="mouth-type-radio" style="position: absolute; top: 5px; left: 5px;">
+            <label>
+                <input type="radio" value="real" name="mouth-type" checked>
+                <span>real</span>
+            </label>
+            <label>
+                <input type="radio" value="fake" name="mouth-type">
+                <span>fake</span>
+            </label>
+        </div>
+        <a id="munch-link" href="munch.html">Endless Munch</a>
+        <img src="./images/human_mouth_closed.png" id="human-mouth-closed-img" />
+        <img src="./images/human_mouth_open.png" id="human-mouth-open-img" style="visibility: hidden;"/>
+        <img src="./images/cartoon_mouth_closed.png" id="cartoon-mouth-closed-img" style="visibility: hidden;" />
+        <img src="./images/cartoon_mouth_open.png" id="cartoon-mouth-open-img" style="visibility: hidden;"/>
+        <script>
+            function checkMousePos(mouseX, mouseY, mouthType) {
+                // if inside mouth, open it
+                const docWidth = $(document).width();
+                const docHeight = $(document).height();
+                if (mouseX >= (docWidth / 2) - 120 && mouseX <= (docWidth / 2) + 120 && mouseY >= (docHeight / 2) - 40 && mouseY <= (docHeight / 2) + 30) {
+                    // show open mouth, hide closed mouth
+                    $(`#${mouthType}-mouth-closed-img`).css('visibility', 'hidden');
+                    $(`#${mouthType}-mouth-open-img`).css('visibility', 'visible');
+                    $('#munch-link').css('visibility', 'visible');
+                } else {
+                    // show closed mouth, hide open mouth
+                    $(`#${mouthType}-mouth-closed-img`).css('visibility', 'visible');
+                    $(`#${mouthType}-mouth-open-img`).css('visibility', 'hidden');
+                    $('#munch-link').css('visibility', 'hidden');
+                }
+            }
+            $(document).ready(function() {
+                $('#mouth-type-radio').change(() => {
+                    const mouthType = $('input[name="mouth-type"]:checked').val();
+                    if (mouthType === "real") {
+                        $('#human-mouth-open-img').css('visibility', 'visible');
+                        $('#human-mouth-closed-img').css('visibility', 'visible');
+                        $('#cartoon-mouth-open-img').css('visibility', 'hidden');
+                        $('#cartoon-mouth-closed-img').css('visibility', 'hidden');
+                        checkMousePos(0, 0, "human");
+                    } else if (mouthType === "fake") {
+                        $('#human-mouth-open-img').css('visibility', 'hidden');
+                        $('#human-mouth-closed-img').css('visibility', 'hidden');
+                        $('#cartoon-mouth-open-img').css('visibility', 'visible');
+                        $('#cartoon-mouth-closed-img').css('visibility', 'visible');
+                        checkMousePos(0, 0, "cartoon");
+                    }
+                });
+
+                $('#human-mouth-closed-img').mousemove((event) => checkMousePos(event.pageX, event.pageY, "human"));
+                $('#human-mouth-open-img').mousemove((event) => checkMousePos(event.pageX, event.pageY, "human"));
+                $('#cartoon-mouth-closed-img').mousemove((event) => checkMousePos(event.pageX, event.pageY, "cartoon"));
+                $('#cartoon-mouth-open-img').mousemove((event) => checkMousePos(event.pageX, event.pageY, "cartoon"));
+            });
+        </script>
+    </body>
+</html>

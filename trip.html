@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.js"></script>
+        <title>?? | Sensory Simulator</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <style>
+            canvas {
+                z-index: -1 !important;
+            }
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            body {
+                background-color: black; 
+                position: relative;
+                margin: 0;
+            }
+            #close-eyes-text {
+                color: white; 
+                font-size: 24px; 
+                transition: 2s;
+                position: absolute;
+                top: 20vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+                user-select: none;
+            }
+            #return-button, #settings-button, #close-button {
+                position: absolute;
+                top: 5px;
+                width: 20px;
+                height: 20px;
+                visibility: hidden;
+                cursor: pointer;
+                z-index: 3;
+            }
+            #return-button {
+                left: 5px;
+            }
+            #settings-button, #close-button {
+                right: 5px;
+            }
+            #settings-panel {
+                color: white;
+                background-color: black;
+                width: 220px;
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                z-index: 2;
+                visibility: hidden;
+                padding: 5px;
+            }
+            #color-preview-box {
+                width: 20px; 
+                height: 20px; 
+                border-radius: 50%;
+            }
+            #color-preview-text {
+                min-width: 70px; 
+                margin: 5px;
+            }
+            #waves-button, #kaleidoscope-button, #trees-button {
+                font-size: 18px;
+            }
+            #start-options {
+                position: absolute; 
+                left: 50vw; 
+                top: 50vh; 
+                transform: translate(-50%, -50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            #get-started-text {
+                position: absolute;
+                left: 50vw;
+                top: 30vh;
+                transform: translate(-50%, -50%);
+                color: rgba(255, 255, 255, 0.5);
+                width: max-content;
+                visibility: hidden;
+                user-select: none;
+            }
+            #red-slider, #green-slider, #blue-slider, #opacity-slider, #stroke-width-slider {
+                margin: 5px 5px 0px 0px;
+            }
+            #reset-button, #save-button, #stroke-width-input {
+                display: none;
+            }
+            .button-container {
+                display: flex; 
+                justify-content: space-around; 
+                margin-top: 50px;
+            }
+            .button-container *:not(:last-child) {
+                margin-right: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <p id="close-eyes-text">Close Your Eyes.</p>
+        <div id="start-options">
+            <span style="color: white; font-size: 24px;">What do you see?</span>
+            <div class="button-container">
+                <button id="waves-button">Waves</button>
+                <button id="trees-button">Trees</button>
+                <button id="kaleidoscope-button">Flowers</button>
+            </div>
+        </div>
+        <div id="get-started-text">(draw on the screen to get started)</div>
+        <img id="return-button" src="https://secure.webtoolhub.com/static/resources/icons/set7/c11f626169b1.png" />
+        <img id="close-button" src="https://flaticons.net/icon.php?slug_category=mobile-application&slug_icon=close" />
+        <div id="settings-button">
+            <svg viewBox="97.051 89.439 269.368 268.144">
+                <path style="stroke: rgb(153, 153, 153); fill: rgb(255, 255, 255);" d="M 151.542 156.685 L 171.871 139.111 L 163.97 104.773 L 196.586 89.439 L 218.407 121.941 L 249.447 121.525 L 267.538 90.046 L 304.032 104.352 L 293.699 139.735 L 315.717 162.65 L 352.073 155.166 L 366.419 187.801 L 334.634 209.338 L 333.263 246.861 L 364.329 269.252 L 345.851 302.752 L 311.949 291.207 L 292.292 307.389 L 299.974 344.502 L 265.88 356.792 L 247.05 325.97 L 215.232 325.256 L 194.42 357.583 L 161.66 344.365 L 169.372 306.788 L 147.881 283.731 L 114.235 291.048 L 97.051 259.801 L 129.426 237.717 L 130.8 201.904 L 100.891 178.817 L 115.318 147.822 Z M 233.308 165.756 C 202.468 165.756 177.467 190.757 177.467 221.598 C 177.467 252.439 202.468 277.44 233.308 277.44 C 264.148 277.44 289.149 252.439 289.149 221.598 C 289.149 190.757 264.148 165.756 233.308 165.756 Z"></path>
+            </svg>
+        </div>
+        <div id="settings-panel">
+            <div style="display: flex; align-items: center;">
+                <span>Color: </span>
+                <span id="color-preview-text"></span>
+                <div id="color-preview-box"></div>
+            </div>
+            <div><input type="range" min="0" max="255" id="red-slider"><span style="color: white;">Red</span></div>
+            <div><input type="range" min="0" max="255" id="green-slider"><span style="color: white;">Green</span></div>
+            <div><input type="range" min="0" max="255" id="blue-slider"><span style="color: white;">Blue</span></div>
+            <div><input type="range" min="0" max="255" id="opacity-slider"><span style="color: white;" id="opacity-slider-label">Opacity</span></div>
+            <div id="stroke-width-input"><input type="range" min="1" max="10" value="2" id="stroke-width-slider"><span style="color: white;" id="stroke-width-label">Stroke: 2</span></div>
+            <div>
+                <button id="reset-button">Reset</button>
+                <button id="save-button">Save</button>
+            </div>
+        </div>
+        <script>
+            let cnv;
+            let wavesCnvSize = [0, 0];
+            let kaleidoscopeCnvSize = [0, 0];
+            let treesCnvSize = [0, 0];
+            // wave variables
+            let numSegmentsX = 0;
+            let numSegmentsY = 0;
+            let t = 0;
+            let currAngles = [];
+            // kaleidoscope variables
+            let symmetryAmt = 6;
+            let symmetryAngle = 360 / symmetryAmt;
+            // settings
+            let mode = "start";
+            const startColor = [18, 219, 155];
+            let prevColor = [...startColor];
+            let prevStrokeWidth = 0;
+            let showingHelpText = false;
+
+            function setup() {
+                cnv = createCanvas(windowWidth, windowHeight);
+                cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+                wavesCnvSize = [windowWidth - 10, windowHeight];
+                kaleidoscopeCnvSize = [windowHeight - 10, windowHeight - 10];
+                treesCnvSize = [windowWidth - 10, windowHeight];
+                noStroke();
+
+                setupMouseEvents();
+                
+                // initial setup
+                setTimeout(() => {
+                    select('#close-eyes-text').style('opacity', 0);
+                    //createStartOptions();
+                }), 1000;
+            }
+
+            function windowResized() {
+                wavesCnvSize = [windowWidth - 10, windowHeight];
+                kaleidoscopeCnvSize = [windowHeight - 10, windowHeight - 10];
+                treesCnvSize = [windowWidth - 10, windowHeight];
+                if (mode === "waves") {
+                    resizeCanvas(wavesCnvSize[0], wavesCnvSize[1]);
+                    numSegmentsX = Math.floor(wavesCnvSize[0] / 30) + 1;
+                    numSegmentsY = Math.floor(wavesCnvSize[1] / 30) + 1;
+                    currAngles = Array.from(Array(numSegmentsX), () => new Array(numSegmentsY).fill(0));
+                    updateAngles(0, 0);
+                } else if (mode === "flower") {
+                    resizeCanvas(kaleidoscopeCnvSize[0], kaleidoscopeCnvSize[1]);
+                } else if (mode === "trees") {
+                    resizeCanvas(treesCnvSize[0], treesCnvSize[1]);
+                }
+            }
+
+            function setupMouseEvents() {
+                let settingsPanel = select('#settings-panel');
+
+                // close button
+                let closeButton = select('#close-button');
+                closeButton.mousePressed(() => {
+                    // hide settings panel and close button
+                    settingsPanel.style('visibility', 'hidden');
+                    closeButton.style('visibility', 'hidden');
+                    // show settings button
+                    select('#settings-button').style('visibility', 'visible');
+                });
+
+                // return button
+                let returnButton = select("#return-button");
+                returnButton.mousePressed(() => {
+                    // return to start mode, clear canvas
+                    mode = "start";
+                    background(0);
+                    // open start options, hide settings button and return button
+                    select('#start-options').style('visibility', 'visible');
+                    select('#settings-button').style('visibility', 'hidden');
+                    select('#return-button').style('visibility', 'hidden');
+                    select('#get-started-text').style('visibility', 'hidden');
+                    settingsPanel.style('visibility', 'hidden');
+                    closeButton.style('visibility', 'hidden');
+                });
+
+                // settings button
+                let settingsButton = select('#settings-button');
+                settingsButton.mousePressed(() => {
+                    // show settings panel and close button
+                    select('#close-button').style('visibility', 'visible');
+                    select('#settings-panel').style('visibility', 'visible');
+                    // hide button
+                    settingsButton.style('visibility', 'hidden');
+                });
+
+                // waves and kaleidoscope buttons
+                select('#waves-button').mousePressed(startWaves);
+                select('#kaleidoscope-button').mousePressed(startKaleidoscope);
+                select('#trees-button').mousePressed(startTrees);
+
+                // reset and save buttons
+                select("#reset-button").mousePressed(() => background(0));
+                select("#save-button").mousePressed(() => save('kaleidoscope.jpg'));
+            }
+
+            function setupSettings(startR, startG, startB, startA) {
+                // set values of sliders
+                select('#opacity-slider').value(startA);
+                select('#red-slider').value(startR);
+                select('#green-slider').value(startG);
+                select('#blue-slider').value(startB);
+                // set color preview
+                let color = ` #${startR.toString(16).toUpperCase().padStart(2, '0')}${startG.toString(16).toUpperCase().padStart(2, '0')}${startB.toString(16).toUpperCase().padStart(2, '0')}`;
+                select('#color-preview-text').html(color);
+                select('#color-preview-box').style('background-color', color);
+
+                // show settings button and return button
+                select('#settings-button').style('visibility', 'visible');
+                select('#return-button').style('visibility', 'visible');
+            }
+
+            function startWaves() {
+                // resize and center canvas
+                resizeCanvas(wavesCnvSize[0], wavesCnvSize[1]);
+                cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+                angleMode(RADIANS);
+                // slight delay to prevent accidental marks
+                setTimeout(() => mode = "waves", 200);
+                select('#start-options').style('visibility', 'hidden');
+                // set wave variables
+                numSegmentsX = Math.floor(wavesCnvSize[0] / 30) + 1;
+                numSegmentsY = Math.floor(wavesCnvSize[1] / 30) + 1;
+                currAngles = Array.from(Array(numSegmentsX), () => new Array(numSegmentsY).fill(0));
+                t = 0;
+                // initial angles
+                updateAngles(0, 0);
+                // add labels (but hide initially)
+                let randomColor = [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
+                setupSettings(randomColor[0], randomColor[1], randomColor[2], 200);
+                // label opacity as "trails"
+                select('#opacity-slider-label').html('Trails');
+                // hide kaleidoscope inputs
+                select("#reset-button").style('display', 'none');
+                select("#save-button").style('display', 'none');
+                select("#stroke-width-input").style('display', 'none');
+            }
+
+            function startKaleidoscope() {
+                // resize and center canvas
+                resizeCanvas(kaleidoscopeCnvSize[0], kaleidoscopeCnvSize[1]);
+                cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+                angleMode(DEGREES);
+                // slight delay to prevent accidental marks
+                setTimeout(() => mode = "flower", 200);
+                select('#start-options').style('visibility', 'hidden');
+                // clear background
+                background(0);
+                // set sliders with random color
+                let randomColor = [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
+                setupSettings(randomColor[0], randomColor[1], randomColor[2], 255);
+                // add reset button and save button to settings panel
+                select("#reset-button").style('display', 'inline');
+                select("#save-button").style('display', 'inline');
+                select("#stroke-width-input").style('display', 'block');
+                // label opacity as "opacity"
+                select('#opacity-slider-label').html('Opacity');
+                // show get-started text
+                showingHelpText = true;
+                select('#get-started-text').style('visibility', 'visible');
+            }
+
+            function startTrees() {
+                // resize and center canvas
+                resizeCanvas(treesCnvSize[0], treesCnvSize[1]);
+                cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+                angleMode(RADIANS);
+                // slight delay to prevent accidental marks
+                setTimeout(() => mode = "trees", 200);
+                // set sliders with random color
+                let randomColor = [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
+                setupSettings(randomColor[0], randomColor[1], randomColor[2], 255);
+                select('#start-options').style('visibility', 'hidden');
+                // label opacity as "opacity"
+                select('#opacity-slider-label').html('Opacity');
+                // hide kaleidoscope inputs
+                select("#reset-button").style('display', 'none');
+                select("#save-button").style('display', 'none');
+                select("#stroke-width-input").style('display', 'none');
+            }
+
+            function updateSliders() {
+                const r = select('#red-slider').value();
+                const g = select('#green-slider').value();
+                const b = select('#blue-slider').value();
+                if (prevColor[0] !== r || prevColor[1] !== g || prevColor[2] !== b) {
+                    prevColor = [r, g, b];
+                    let color = ` #${r.toString(16).toUpperCase().padStart(2, '0')}${g.toString(16).toUpperCase().padStart(2, '0')}${b.toString(16).toUpperCase().padStart(2, '0')}`;
+                    select('#color-preview-text').html(color);
+                    select('#color-preview-box').style('background-color', color);
+                }
+                const sw = select('#stroke-width-slider').value();
+                if (sw !== prevStrokeWidth) {
+                    prevStrokeWidth = sw;
+                    select('#stroke-width-label').html(`Stroke: ${sw}`);
+                }
+            }
+
+            function updateAngles(currMouseX, currMouseY) {
+                for (let xIdx = 0; xIdx < numSegmentsX; xIdx++) {
+                    let x = xIdx * 30;
+                    for (let yIdx = 0; yIdx < numSegmentsY; yIdx++) {
+                        let y = yIdx * 30;
+                        // starting point of each circle depends on mouse position
+                        const xAngle = map(currMouseX, 0, width, -4 * PI, 4 * PI, true);
+                        const yAngle = map(currMouseY, 0, height, -4 * PI, 4 * PI, true);
+                        // and also varies based on the particle's location
+                        const angle = xAngle * (x / width) + yAngle * (y / height);
+                        currAngles[xIdx][yIdx] = angle;
+                    }
+                }
+            }
+
+            function draw() {
+                updateSliders();
+                if (mode === "waves") {
+                    drawWaves();
+                } else if (mode === "flower") {
+                    drawKaleidoscope();
+                } else if (mode === "trees") {
+                    drawTrees();
+                }
+            }
+            
+            function drawWaves() {
+                const r = select('#red-slider').value();
+                const g = select('#green-slider').value();
+                const b = select('#blue-slider').value();
+                const trails = select('#opacity-slider').value();
+                // reverse range; high trails = low opacity
+                const opacity = map(trails, 0, 255, 255, 0);
+                if (t < 20) {
+                    fill(r, g, b, map(t, 0, 20, 0, 255));
+                } else {
+                    fill(r, g, b);
+                }
+                
+                noStroke();
+                
+                background(10, opacity); // translucent background creates trails
+                // change position if clicking inside canvas
+                if (mouseIsPressed) {
+                    let cnvPos = cnv.position();
+                    let insideCanvas = mouseX <= cnvPos.x + width && mouseX >= cnvPos.x && mouseY <= cnvPos.y + height && mouseY >= cnvPos.y;
+                    if (insideCanvas) {
+                        // make sure not in top left corder
+                        if (!(mouseY < 40 && mouseX >= cnvPos.x + width - 40)) {
+                            // don't update waves is using sliders
+                            let settingsPanel = select('#settings-panel');
+                            let settingsPanelSize = settingsPanel.size();
+                            if (settingsPanel.style('visibility') == 'hidden' || !(mouseY < settingsPanelSize.height && mouseX >= cnvPos.x + width - settingsPanelSize.width)) {
+                                updateAngles(mouseX, mouseY);
+                            }
+                        }
+                    }
+                }
+                // x and y grid of ellipses
+                for (let xIdx = 0; xIdx < numSegmentsX; xIdx++) {
+                    let x = xIdx * 30;
+                    for (let yIdx = 0; yIdx < numSegmentsY; yIdx++) {
+                        let y = yIdx * 30;
+                        // each particle moves in a circle
+                        const myX = x + 20 * cos(2 * PI * t + currAngles[xIdx][yIdx]);
+                        const myY = y + 20 * sin(2 * PI * t + currAngles[xIdx][yIdx]);
+
+                        ellipse(myX, myY, 10); // draw particle
+                    }
+                }
+
+                t = t + 0.01; // update time
+                
+            }
+
+            function drawKaleidoscope() {
+                const r = select('#red-slider').value();
+                const g = select('#green-slider').value();
+                const b = select('#blue-slider').value();
+                const opacity = select('#opacity-slider').value();
+                stroke(r, g, b, opacity);
+                noFill();
+
+                translate(width / 2, height / 2);
+
+                if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+                    //let mx = mouseX - width / 2;
+                    let mx = mouseX - height / 2;
+                    let my = mouseY - height / 2;
+                    //let pmx = pmouseX - width / 2;
+                    let pmx = pmouseX - height / 2;
+                    let pmy = pmouseY - height / 2;
+                    
+                    if (mouseIsPressed) {
+                        // hide help text if was currently displaying
+                        if (showingHelpText) {
+                            showingHelpText = false;
+                            select('#get-started-text').style('visibility', 'hidden');
+                        }
+                        //let sw = 2;
+                        let sw = select('#stroke-width-slider').value();
+                        for (let i = 0; i < symmetryAmt; i++) {
+                            rotate(symmetryAngle);
+                            strokeWeight(sw);
+                            line(mx, my, pmx, pmy);
+                            push();
+                            scale(1, -1);
+                            line(mx, my, pmx, pmy);
+                            pop();
+                        }
+                    }
+                }
+            }
+            let segLength = 270;
+            function drawTrees() {
+                segLength = height * (270 / 789);
+                background(0);
+                const r = select('#red-slider').value();
+                const g = select('#green-slider').value();
+                const b = select('#blue-slider').value();
+                const opacity = select('#opacity-slider').value();
+                stroke(r, g, b, opacity);
+                // Let's pick an angle 0 to 90 degrees based on the mouse position
+                let a = (mouseX / width) * 180;
+                //segLength = map(mouseY, 0, height, 300, 100);
+                // Convert it to radians
+                theta = radians(a);
+                // Start the tree from the bottom of the screen
+                translate(width/2,height);
+                // Draw a line 120 pixels
+                line(0,0,0,-1*segLength);
+                // Move to the end of that line
+                translate(0,-1*segLength);
+                // Start the recursive branching!
+                branch(segLength);
+            }
+
+            function branch(h) {
+                // Each branch will be 2/3rds the size of the previous one
+                h *= 0.66;
+
+                // All recursive functions must have an exit condition!!!!
+                // Here, ours is when the length of the branch is 2 pixels or less
+                if (h > 2) {
+                    push();    // Save the current state of transformation (i.e. where are we now)
+                    rotate(theta);   // Rotate by theta
+                    line(0, 0, 0, -h);  // Draw the branch
+                    translate(0, -h); // Move to the end of the branch
+                    branch(h);       // Ok, now call myself to draw two new branches!!
+                    pop();     // Whenever we get back here, we "pop" in order to restore the previous matrix state
+
+                    // Repeat the same thing, only branch off to the "left" this time!
+                    push();
+                    rotate(-theta);
+                    line(0, 0, 0, -h);
+                    translate(0, -h);
+                    branch(h);
+                    pop();
+                }
+            }
+        </script>
+    </body>
+</html>

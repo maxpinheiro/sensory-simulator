@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hold Hands | Sensory Simulator</title>
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <style>
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            body {
+                background-color: white;
+                position: relative;
+            }
+            #arm-type-radio {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+            }
+            #arm-count-radio {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="arm-type-radio">
+            Arm Type: 
+            <label>
+                <input type="radio" value="human" name="arm-type" checked="true">
+                <span>human</span>
+            </label>
+            <label>
+                <input type="radio" value="robot" name="arm-type">
+                <span>robot</span>
+            </label>
+        </div>
+        <div id="arm-count-radio">
+            Arm Count: 
+            <input type="radio" name="arm-count" value="2" checked>
+            <label for="2">2</label>
+            <input type="radio" name="arm-count" value="4">
+            <label for="2">4</label>
+        </div>
+        <script>
+            //let segLength = 113; //80;
+            let segLength = 100; //80;
+            //let handLength = segLength / 3;
+            //let handHeight = segLength * (40 / 80);//30;
+            let handLength = 90 * (segLength / 113);
+            let handHeight = 86 * (segLength / 113);
+            let arms = [];
+            let robotBackarmImg;
+            let robotForearmImg;
+            let robotHandOpenImg;
+            let robotHandClosedImg;
+            let humanBackarmImg;
+            let humanForearmImg;
+            let humanHandOpenImg;
+            let humanHandClosedImg;
+
+            function preload() {
+                robotBackarmImg = loadImage('./images/robot_backarm.png')
+                robotForearmImg = loadImage('./images/robot_forearm.png')
+                robotHandOpenImg = loadImage('./images/robot_hand_open.png')
+                robotHandClosedImg = loadImage('./images/robot_hand_closed.png')
+                humanBackarmImg = loadImage('./images/human_backarm.png')
+                humanForearmImg = loadImage('./images/human_forearm.png')
+                humanHandOpenImg = loadImage('./images/human_hand_open.png')
+                humanHandClosedImg = loadImage('./images/human_hand_closed.png')
+            }
+
+            function setupArms() {
+                const armCount = select('input[name="arm-count"]:checked').value();
+                console.log(armCount);
+                if (armCount == '4') {
+                    let leftArm = {
+                        origin: {x: 0, y: height / 2},
+                        joint: {x: width / 4, y: height / 2},
+                    };
+                    let rightArm = {
+                        origin: {x: width, y: height / 2},
+                        joint: {x: width - width / 4, y: height / 2},
+                    };
+                    let topArm = {
+                        origin: {x: width / 2, y: 0},
+                        joint: {x: width / 2, y: 0},
+                    };
+                    let bottomArm = {
+                        origin: {x: width / 2, y: height},
+                        joint: {x: width / 2, y: height},
+                    };
+                    arms = [leftArm, rightArm, topArm, bottomArm];
+                } else {
+                    let leftArm = {
+                        origin: {x: width / 4, y: height / 2},
+                        joint: {x: width / 4, y: height / 2},
+                    };
+                    let rightArm = {
+                        origin: {x: width - width / 4, y: height / 2},
+                        joint: {x: width - width / 4, y: height / 2},
+                    };
+                    arms = [leftArm, rightArm];
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+                strokeWeight(20);
+                stroke(247, 135, 74, 100);
+
+                //let armCountRadio = select('#arm-count-radio');
+                setupArms();
+                // event listener for charnging arm count
+                select('#arm-count-radio').changed(setupArms);
+            }
+
+            function windowResized() {
+                resizeCanvas(windowWidth, windowHeight);
+                setupArms();
+                /*
+                let leftArm = {
+                    origin: {x: 0, y: height / 2},
+                    joint: {x: width / 4, y: height / 2},
+                }
+                let rightArm = {
+                    origin: {x: width, y: height / 2},
+                    joint: {x: width - width / 4, y: height / 2},
+                }
+                arms = [leftArm, rightArm];*/
+            }
+
+            function draw() {
+                background(255);
+                //background(0);
+                //background(89, 172, 186);
+                strokeWeight(20);
+                stroke(247, 135, 74, 100);
+                //dragSegment(0, mouseX, mouseY);
+                for (let armIdx = 0; armIdx < arms.length; armIdx++) {
+                    updateArm(armIdx);
+                }
+            }
+            
+            function updateArm(armIdx) {
+                let arm = arms[armIdx];
+                if (!arm) return;
+                //background(255);
+
+                // calculate angles
+                dx = mouseX - arm.joint.x;
+                dy = mouseY - arm.joint.y;
+                jointAngle = atan2(dy, dx);
+                tx = mouseX - cos(jointAngle) * segLength;
+                ty = mouseY - sin(jointAngle) * segLength;
+                dx = tx - arm.origin.x;
+                dy = ty - arm.origin.y;
+                shoulderAngle = atan2(dy, dx);
+
+                // update joint
+                arm.joint.x = arm.origin.x + cos(shoulderAngle) * segLength;
+                arm.joint.y = arm.origin.y + sin(shoulderAngle) * segLength;
+
+                let handX = arm.joint.x + cos(jointAngle) * segLength;
+                let handY = arm.joint.y + sin(jointAngle) * segLength;
+                let withinReach = Math.abs(mouseX - handX) <= handLength / 2 && Math.abs(mouseY - handY) <= handHeight;
+
+                let armType = select('#arm-type-radio').value();
+                if (armType === 'robot') {
+                    noStroke();
+                    fill(45);
+                    // shoulder joint
+                    circle(arm.origin.x, arm.origin.y, 45);
+                    // elbow joint
+                    circle(arm.joint.x, arm.joint.y, handHeight*0.8);
+                    // arms and hand
+                    backarm(robotBackarmImg, arm.origin.x, arm.origin.y, shoulderAngle);
+                    forearm(robotForearmImg, arm.joint.x, arm.joint.y, jointAngle);
+                    drawHand(robotHandClosedImg, robotHandOpenImg, handX, handY, jointAngle, withinReach);
+                } else if (armType === 'human') {
+                    noStroke();
+                    // shoulder joint
+                    //fill(230,198,178);
+                    fill(219, 178, 147);
+                    //fill(171,130,112);
+                    circle(arm.origin.x, arm.origin.y, handHeight*0.7);
+                    // elbow joint
+                    fill(219, 178, 147);
+                    circle(arm.joint.x, arm.joint.y+5, handHeight*0.5);
+                    // arms and hand
+                    backarm(humanBackarmImg, arm.origin.x, arm.origin.y, shoulderAngle);
+                    forearm(humanForearmImg, arm.joint.x, arm.joint.y, jointAngle);
+                    drawHand(humanHandClosedImg, humanHandOpenImg, handX, handY, jointAngle, withinReach);
+                }
+                
+            }
+
+            function backarm(img, x, y, a) {
+                // original image = 250 × 129
+                push();
+                translate(x, y);
+                rotate(a);
+                //image(img, 0, handHeight / -2, segLength, (segLength / 250) * 129);
+                image(img, 0, handHeight / -2, segLength, handHeight);
+                pop();
+            }
+
+            function forearm(img, x, y, a) {
+                // original image = 258 × 110
+                push();
+                translate(x, y);
+                rotate(a);
+                //image(img, 0, handHeight / -3, segLength, (segLength / 258) * 110);
+                image(img, 0, handHeight / -2, segLength, handHeight);
+                pop();
+            }
+
+            function drawHand(closedImg, openImg, x, y, angle, handClosed) {
+                // original image = 167 × 153
+                let handImg = handClosed ? closedImg : openImg;
+                push();
+                translate(x, y);
+                rotate(angle);
+                //image(handImg, 0, 0, handLength, (handLength / 167) * 153);
+                //image(handImg, 0, handHeight / -2, (handHeight / 153) * 167, handHeight);
+                image(handImg, 0, handHeight / -2, handLength, handHeight);
+                pop();
+            }
+
+        </script>
+    </body>
+</html>

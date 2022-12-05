@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <span>Enter a number: </span>
+            <input id="number-input" type="text" pattern="[0-9]+" />
+            <button id="submit-number">Submit</button>
+        </div>
+        <div>
+            <label for="type">Fact Type:</label>
+            <input type="radio" name="type" value="math" checked>Math</input>
+            <input type="radio" name="type" value="trivia">Trivia</input>
+            <input type="radio" name="type" value="year">Year</input> 
+            <input type="radio" name="type" value="date">Date</input> 
+        </div>
+        <div>
+            <p id="response"></p>
+        </div>
+        <script>
+            $(document).ready(function() {  
+                $('#submit-number').click(() => {
+                    const num = parseInt($('#number-input').val());
+                    var factType = $("input[name='type']:checked").val();
+                    console.log(factType);
+                    if (num) {
+                        fetch(`http://numbersapi.com/${num}/${factType || 'math'}`).then(res => res.text()).then(data => {
+                            if (data) {
+                                $('#response').html(data);
+                            }
+                        })
+                    } else {
+                        $('#response').html('must input a valid number');
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

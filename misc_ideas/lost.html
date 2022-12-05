@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <style>
+            html, body {
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+                margin: 0;
+            }
+            .hide-cursor {
+                cursor: none;
+            }
+            .gradient {
+                /*animation: gradient 8s linear alternate infinite;*/
+                animation: gradient-rainbow 20s linear infinite;
+            }
+            #get-found {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                border: none;
+                background-color: transparent;
+                color: white;
+                cursor: pointer;
+            }
+            @keyframes gradient {
+                from {
+                    background-color: white;
+                }
+                to {
+                    background-color: blue;
+                }
+            }
+            @keyframes gradient-rainbow {
+                0% {
+                    background-color: white;
+                }
+                14% {
+                    background-color: green;
+                }
+                28% {
+                    background-color: blue;
+                }
+                42% {
+                    background-color: rgb(156, 21, 194);
+                }
+                56% {
+                    background-color: rgb(224, 39, 104);
+                }
+                70% {
+                    background-color: rgb(244, 0, 0);
+                }
+                84% {
+                    background-color: rgb(244, 122, 0);
+                }
+                96% {
+                    background-color: rgb(244, 216, 0);
+                }
+                100% {
+                    background-color: white;
+                }
+            }
+            @keyframes gradient-multiple {
+                0% {
+                    background-color: white;
+                }
+                25% {
+                    background-color: green;
+                }
+                50% {
+                    background-color: blue;
+                }
+                75% {
+                    background-color: purple;
+                }
+            }
+        </style>
+    </head>
+    <body id="body">
+        
+        <div style="display: flex; justify-content: center; margin-top: 40vh;">
+            <button id="get-lost">Allow Yourself To Get Lost</button>
+        </div>
+    
+        <!--<button id="get-lost" style="position: absolute; top: 45%;">Allow Yourself To Get Lost</button>-->
+        <!--<button id="get-found">Return to Existence</button>-->
+        <script>
+            $(document).ready(function() {
+                $('#get-lost').click(() => {
+                    $('html').css('cursor', 'none');
+                    $('html').addClass('gradient');
+                    $('#get-lost').css('display', 'none');
+                    $('html').mousemove(() => {
+                        $('html').removeClass('gradient');
+                        setTimeout(() => $('html').addClass('gradient'), 3000);
+                    })
+                });
+                $('#get-found').click(() => {
+                    $('html').css('cursor', 'auto');
+                    $('html').removeClass('gradient');
+                    $('#get-lost').css('display', 'block');
+                });
+            });
+            
+        </script>
+    </body>
+</html>

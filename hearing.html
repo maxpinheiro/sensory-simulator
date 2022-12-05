@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hearing | Sensory Simulator</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <style>
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            body {
+                position: relative;
+                margin: 0;
+            }
+            .title-text {
+                position: absolute;
+                top: 10vh;
+                left: 50vw;
+                transform: translate(-50%, -50%);
+                font-size: 32px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="ear-type-radio" style="position: absolute; top: 5px; left: 5px;">
+            <label>
+                <input type="radio" value="real" name="ear-type" checked="true">
+                <span>real</span>
+            </label>
+            <label>
+                <input type="radio" value="fake" name="ear-type">
+                <span>fake</span>
+            </label>
+        </div>
+        <div class="title-text">Hearing</div>
+        <script>
+            $(document).ready(function() {
+                /*
+                $('#ear-type-radio').change(() => {
+                    const armType = $('input[name="ear-type"]:checked').val();
+                    if (armType === "real") {
+                        $('#human-right-palm').css('display', 'block');
+                        $('#human-left-palm').css('display', 'block');
+                        $('#cartoon-right-palm').css('display', 'none');
+                        $('#cartoon-left-palm').css('display', 'none');
+                    } else if (armType === "fake") {
+                        $('#cartoon-right-palm').css('display', 'block');
+                        $('#cartoon-left-palm').css('display', 'block');
+                        $('#human-right-palm').css('display', 'none');
+                        $('#human-left-palm').css('display', 'none');
+                    }
+                });
+                */
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Endless Munch | Sensory Simulator</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody">
+        <style>
+            * {
+                font-family: Anybody, Verdana, sans-serif;
+            }
+            #food-img, #mouth-img {
+                position: absolute; 
+                top: 55%;
+                transform: translateY(-50%);
+            }
+            #food-img {
+                min-width: 100px; 
+                min-height: 100px; 
+                max-width: 200px; 
+                max-height: 200px;
+                left: 20%;
+                z-index: 1;
+            }
+            #mouth-img {
+                right: 10%;
+            }
+            .move-right {
+                animation: right 2s linear;
+            }
+            @keyframes right {
+                from {
+                    left: 20%;
+                }
+                to {
+                    left: 70%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <h2>Endless Munch</h2>
+            <p>All the food you could ever want, but with <i>none</i> of those pesky calories!</p>
+            <div class="button-container" style="z-index: 3;">
+                <button id="new-pizza">Pizza</button>
+                <button id="new-burger">Burger</button>
+                <button id="new-pasta">Pasta</button>
+                <button id="new-cookies">Cookies</button>
+                <button id="new-ice-cream">Ice Cream</button>
+                <button id="eat" disabled>Eat!</button>
+            </div>
+        </div>
+        <img id="food-img" src="" alt="food no longer available" style="visibility: hidden;" />
+        <img id="mouth-img" src="images/side_mouth_closed.png" style="width: 500px; z-index: 2;" />
+        <script>
+            const allButtons = ['pizza', 'burger', 'pasta', 'cookies', 'ice-cream'];
+            $(document).ready(function () {
+                allButtons.forEach(food => {
+                    $(`#new-${food}`).click(() => {
+                        getRandomFoodImgJson(food);
+                    })
+                });
+                $('#eat').click(() => {
+                    // disable buttons
+                    allButtons.forEach(food => {
+                        $(`#new-${food}`).attr('disabled', true);
+                    });
+                    // open mouth
+                    $('#mouth-img').attr('src', 'images/side_mouth_open.png');
+                    // animate food moving to right
+                    $('#food-img').addClass('move-right');
+                    // wait 2s then remove image and close mouth
+                    setTimeout(() => {
+                        // remove food
+                        const foodImgElm = $('#food-img');
+                        foodImgElm.removeClass('move-right');
+                        foodImgElm.attr('src', '');
+                        foodImgElm.css('visibility', 'hidden');
+                        // close mouth
+                        $('#mouth-img').attr('src', 'images/side_mouth_closed.png');
+                        // enable/disable buttons
+                        $('#eat').attr('disabled', true);
+                        allButtons.forEach(food => {
+                            $(`#new-${food}`).attr('disabled', false);
+                        });
+                    }, 2000);
+                })
+            });
+            function getRandomFoodImgJson(category) {
+                // category: pizza/burger/pasta/rice/dessert
+                fetch('./images/food_images.json', {mode: 'cors'}).then(res => res.json()).then(data => {
+                    const images = data[category]
+                    if (images) {
+                        const foodImg = images[Math.floor(Math.random() * images.length)];
+                        const foodImgElm = $('#food-img');
+                        foodImgElm.attr('src', foodImg);
+                        foodImgElm.css('visibility', 'visible');
+                        //foodImgElm.css('top', $('#food-container').height() / 2 - 10 - foodImgElm.height() / 2);
+                        $('#eat').attr('disabled', false);
+                    }
+                });
+            }
+            function getRandomFoodImg(category) {
+                // category: pizza/burger/pasta/rice/dessert
+                fetch(`https://foodish-api.herokuapp.com/images/${category || 'pizza'}/`, { mode: 'cors', headers: {'Content-Type': 'application/json'} }).then(res => res.text()).then(data => {
+                    const html = $.parseHTML(data)
+                    const foodImg = $(html).find('input').val();
+                    if (foodImg) {
+                        const foodImgElm = $('#food-img');
+                        foodImgElm.attr('src', foodImg);
+                        foodImgElm.css('top', $('#food-container').height() / 2 - foodImgElm.height() / 2);
+                        $('#eat').attr('disabled', false);
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
